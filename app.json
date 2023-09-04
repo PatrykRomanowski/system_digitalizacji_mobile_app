@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "system_digitalizacji_mobile_app",
+    "slug": "system_digitalizacji_mobile_app",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
