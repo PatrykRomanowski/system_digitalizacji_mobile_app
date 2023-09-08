@@ -1,17 +1,50 @@
 import React, { useState } from "react";
 import { Text, StyleSheet, Button, TextInput, View } from "react-native";
+
+import { useSelector, useDispatch } from "react-redux";
+
+import userContext from "../storage/user-context";
+import { userActions } from "../storage/user-context";
+
 import { useNavigation } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
+
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+import { auth2 } from "./firebase";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
-  const handleLogin = () => {
-    // Tutaj możesz dodać logikę logowania
-    // Po zalogowaniu możesz przechodzić do innych ekranów lub wykonać inne akcje
-    navigation.navigate("Home"); // Przykład przechodzenia do głównego ekranu
+  const dispatch = useDispatch();
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth2, login, password).then(
+        (userInfo) => {
+          const userId = userInfo.user.uid;
+          console.log(userId);
+          dispatch(userActions.addActualUserId({ value: userId }));
+          setIsModalVisible(true); // Pokaż modal
+          setModalMessage("Logowanie udane!"); // Ustaw treść modala
+          setTimeout(() => {
+            setIsModalVisible(false); // Ukryj modal po 2 sekundach
+            navigation.navigate("Home"); // Przykład przechodzenia do głównego ekranu
+          }, 2000);
+        }
+      );
+    } catch {
+      setIsModalVisible(true);
+      setModalMessage("Nie udało się poprawnie zalogować");
+      setTimeout(() => {
+        setIsModalVisible(false); // Ukryj modal po 2 sekundach
+        // navigation.navigate("Home"); // Przykład przechodzenia do głównego ekranu
+      }, 2000);
+    }
   };
 
   return (
@@ -35,6 +68,13 @@ const LoginScreen = () => {
         onChangeText={(text) => setPassword(text)}
       />
       <Button title="Zaloguj" onPress={handleLogin} />
+
+      {/* Modal */}
+      {isModalVisible && (
+        <Animatable.View animation="fadeIn" duration={500} style={styles.modal}>
+          <Text style={styles.modalText}>{modalMessage}</Text>
+        </Animatable.View>
+      )}
     </Animatable.View>
   );
 };
@@ -57,10 +97,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingLeft: 10,
   },
-  image: {
-    width: 200,
-    height: 200,
-    marginBottom: 20,
+  modal: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+  },
+  modalText: {
+    fontSize: 18,
+    color: "white",
+    padding: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    borderRadius: 5,
   },
 });
 
