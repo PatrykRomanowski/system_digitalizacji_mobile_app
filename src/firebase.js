@@ -1,20 +1,38 @@
-import { initializeApp } from "firebase/app";
-import { getStorage } from "firebase/storage";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
+import {
+  initializeApp
+} from "firebase/app";
+import {
+  getStorage
+} from "firebase/storage";
+import {
+  getAuth
+} from "firebase/auth";
+import {
+  getDatabase
+} from "firebase/database";
 
 // import { getFirestore } from "firebase/firestore";
+import {
+  React_App_APIKEY,
+  React_App_authDomain,
+  React_App_databaseURL,
+  React_App_projectId,
+  React_App_STORAGE,
+  React_App_messagingSenderId,
+  React_App_appId,
+  Raect_App_measurementId
+} from "@env";
+
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDSiJiJerZfaSL61dYaRIpyZQ3Z8oKShMw",
-  authDomain: process.env.React_App_authDomain,
-  projectId: process.env.React_App_projectId,
-  databaseURL:
-    "https://systemdigitalizacji-default-rtdb.europe-west1.firebasedatabase.app",
-  storageBucket: "systemdigitalizacji.appspot.com",
-  messagingSenderId: process.env.React_App_messagingSenderId,
-  appId: process.env.appId,
-  measurementId: process.env.Raect_App_measurementId,
+  apiKey: React_App_APIKEY,
+  authDomain: React_App_authDomain,
+  projectId: React_App_projectId,
+  databaseURL: React_App_databaseURL,
+  storageBucket: React_App_STORAGE,
+  messagingSenderId: React_App_messagingSenderId,
+  appId: React_App_appId,
+  measurementId: Raect_App_measurementId,
 };
 
 export const app = initializeApp(firebaseConfig);

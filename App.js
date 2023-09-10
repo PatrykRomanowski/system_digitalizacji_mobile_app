@@ -13,6 +13,7 @@ import BookScreen from "./src/bookScreen";
 import SettingScreen from "./src/settingScreen";
 import ReceiptScreen from "./src/receiptScreen";
 import DocumentScreen from "./src/documentsScreen";
+import ShowDocumentGallery from "./src/showDocumentGallery";
 
 import store from "./storage";
 
@@ -85,6 +86,11 @@ export default function App() {
           <Stack.Screen
             name="Home"
             component={MainStack}
+            // options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="GalleryDocument"
+            component={ShowDocumentGallery}
             // options={{ headerShown: false }}
           />
           <Stack.Screen
