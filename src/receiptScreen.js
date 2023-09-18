@@ -94,6 +94,7 @@ const ReceiptScreen = () => {
               itemDescription: item.description,
               itemSize: item.size.reduce((acc, current) => acc + current),
               itemCategory: categoryKey,
+              itemValue: item.value,
             });
           }
         }
@@ -114,6 +115,7 @@ const ReceiptScreen = () => {
     navigation.navigate("GalleryDocument", {
       itemCategory: props.itemCategory,
       itemId: props.itemId,
+      folderName: "receipt",
     }); // Przechodzi do ekranu 'Home2'
 
     console.log("XD");
@@ -127,11 +129,17 @@ const ReceiptScreen = () => {
       style={styles.itemContainer}
       key={item.itemId}
     >
-      <View>
+      <View style={styles.allDataContainer}>
         <Text style={styles.textDescription}>{item.itemDescription}</Text>
-        <View>
-          <Text style={styles.textCategoryContainer}>Kategoria:</Text>
-          <Text style={styles.textCategory}>{item.itemCategory}</Text>
+        <View style={styles.insideContainer}>
+          <View styles={styles.valueContainer}>
+            <Text style={styles.textCategoryContainer}>Kategoria:</Text>
+            <Text style={styles.textCategory}>{item.itemCategory}</Text>
+          </View>
+          <View style={styles.valueContainer}>
+            <Text style={styles.textCategoryContainer}>Wartość:</Text>
+            <Text style={styles.textCategory}>{item.itemValue} ZŁ</Text>
+          </View>
         </View>
       </View>
       <View style={styles.sizeContainer}>
@@ -149,11 +157,17 @@ const ReceiptScreen = () => {
       style={styles.itemContainer}
       key={item.itemId}
     >
-      <View>
+      <View style={styles.allDataContainer}>
         <Text style={styles.textDescription}>{item.itemDescription}</Text>
-        <View>
-          <Text style={styles.textCategoryContainer}>Kategoria:</Text>
-          <Text style={styles.textCategory}>{item.itemCategory}</Text>
+        <View style={styles.insideContainer}>
+          <View styles={styles.valueContainer}>
+            <Text style={styles.textCategoryContainer}>Kategoria:</Text>
+            <Text style={styles.textCategory}>{item.itemCategory}</Text>
+          </View>
+          <View style={styles.valueContainer}>
+            <Text style={styles.textCategoryContainer}>Wartość:</Text>
+            <Text style={styles.textCategory}>{item.itemValue} ZŁ</Text>
+          </View>
         </View>
       </View>
       <View style={styles.sizeContainer}>
@@ -197,8 +211,18 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    marginBottom: 20,
+    marginBottom: 30,
     marginTop: 30,
+  },
+  allDataContainer: {
+    display: "flex",
+  },
+  insideContainer: {
+    display: "flex",
+    flexDirection: "row",
+
+    justifyContent: "space-between",
+    // alignItems: "space-between",
   },
   input: {
     width: 300,
@@ -227,6 +251,7 @@ const styles = StyleSheet.create({
   },
   textDescription: {
     fontSize: 20,
+    marginBottom: 20,
   },
   textCategory: { fontWeight: "bold", fontSize: 12 },
   textCategoryContainer: { marginTop: 7, fontSize: 12 },
@@ -243,6 +268,10 @@ const styles = StyleSheet.create({
   },
   sizeContainer: {
     alignItems: "center",
+  },
+  valueContainer: {
+    marginLeft: 20,
+    width: 200,
   },
 });
 

@@ -114,6 +114,7 @@ const DocumentScreen = () => {
     navigation.navigate("GalleryDocument", {
       itemCategory: props.itemCategory,
       itemId: props.itemId,
+      folderName: "document",
     }); // Przechodzi do ekranu 'Home2'
 
     console.log("XD");
@@ -121,9 +122,12 @@ const DocumentScreen = () => {
 
   const showAllItem = allItem.map((item) => (
     <TouchableOpacity
-      onPress={() =>
-        getPhotos({ itemCategory: item.itemCategory, itemId: item.itemId })
-      }
+      onPress={() => {
+        getPhotos({
+          itemCategory: item.itemCategory,
+          itemId: item.itemId,
+        });
+      }}
       style={styles.itemContainer}
       key={item.itemId}
     >
@@ -198,7 +202,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    marginBottom: 20,
+    marginBottom: 30,
     marginTop: 30,
   },
   input: {
@@ -228,6 +232,7 @@ const styles = StyleSheet.create({
   },
   textDescription: {
     fontSize: 20,
+    marginBottom: 20,
   },
   textCategory: { fontWeight: "bold", fontSize: 12 },
   textCategoryContainer: { marginTop: 7, fontSize: 12 },

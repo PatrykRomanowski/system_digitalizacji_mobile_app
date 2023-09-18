@@ -17,10 +17,11 @@ const ShowDocumentGallery = ({ route }) => {
   const getPhotos = async () => {
     const category = route.params.itemCategory;
     const itemId = route.params.itemId;
+    const actualFolder = route.params.folderName;
     console.log("XD:" + route.params.itemCategory);
-    console.log("XD:" + route);
+    console.log("XD:" + route.params.folderName);
 
-    const actualRef = `/users/${actualUserId}/document/${category}/${itemId}`;
+    const actualRef = `/users/${actualUserId}/${actualFolder}/${category}/${itemId}`;
     //////////////////////////////tutaj zmiany
     console.log(actualRef);
     const storageRef = ref(myStorage, actualRef);
