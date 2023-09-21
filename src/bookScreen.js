@@ -14,13 +14,7 @@ import { ref, get } from "firebase/database";
 import { useSelector } from "react-redux";
 
 import { firebaseRealtime } from "./firebase";
-import {
-  listAll,
-  ref as refStorage,
-  getDownloadURL,
-  getStorage,
-  deleteObject,
-} from "firebase/storage";
+import { listAll, ref as refStorage, getDownloadURL } from "firebase/storage";
 
 import { myStorage } from "./firebase";
 
@@ -29,16 +23,13 @@ const BookScreen = () => {
 
   const [allBooks, setAllBooks] = useState([]);
   const [allItems, setAllItems] = useState([]);
-  const [descriptionValue, setDescriptionValue] = useState("");
-  const [categoryValue, setCategoryValue] = useState("");
+  const [authorValue, setAuthorValue] = useState("");
+  const [titleValue, setTitleValue] = useState("");
   const [refreshing, setRefreshing] = useState(true);
   const [indicatorIsActive, setIndicatorIsActive] = useState(true);
+  const [sortAllItem, setSortAllItem] = useState([]);
 
   const onRefresh = () => {
-    // Tutaj możesz umieścić logikę do odświeżenia danych
-    // Na przykład, pobranie nowych danych z serwera
-    // Po zakończeniu odświeżania ustaw stan refreshing na false
-
     console.log("XD");
     setRefreshing(false);
   };
@@ -110,6 +101,23 @@ const BookScreen = () => {
     setIndicatorIsActive(false);
   }, [allBooks]);
 
+  useEffect(() => {
+    console.log("XD2");
+  }, [sortAllItem]);
+
+  useEffect(() => {
+    if (authorValue || titleValue) {
+      if (authorValue && titleValue) {
+        const sortItems = allItems.filter((item) => {
+          return item.bookTitle
+            .toLowerCase()
+            .includes(titleValue.toLowerCase());
+        });
+        setSortAllItem(sortItems);
+      }
+    }
+  }, [authorValue, titleValue]);
+
   return (
     <ScrollView
       scrollEventThrottle={120}
@@ -125,20 +133,22 @@ const BookScreen = () => {
         refreshing={refreshing} // Stan, który kontroluje, czy odświeżanie jest aktywowane
         onRefresh={onRefresh} // Funkcja, która ma być wywołana podczas odświeżania
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Wyszukaj po opisie"
-        value={descriptionValue}
-        onChangeText={(text) => setDescriptionValue(text)}
-      />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Wyszukaj po tytule"
+          value={titleValue}
+          onChangeText={(text) => setTitleValue(text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Wyszukaj po autorze"
+          value={authorValue}
+          onChangeText={(text) => setAuthorValue(text)}
+        />
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Wyszukaj po kategorii"
-        value={categoryValue}
-        onChangeText={(text) => setCategoryValue(text)}
-      />
-      <Text style={styles.text}>Twoje paragony</Text>
+      <Text style={styles.text}>Twoje książki</Text>
       {indicatorIsActive ? (
         <ActivityIndicator size="large" style={styles.indicator} />
       ) : null}
@@ -163,6 +173,14 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
     fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  inputContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     width: 150, // dostosuj szerokość i wysokość obrazu do swoich potrzeb

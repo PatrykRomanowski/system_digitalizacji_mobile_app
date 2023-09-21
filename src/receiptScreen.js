@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 30,
     marginTop: 30,
+    fontWeight: "bold",
   },
   allDataContainer: {
     display: "flex",
