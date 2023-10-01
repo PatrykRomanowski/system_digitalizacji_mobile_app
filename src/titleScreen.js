@@ -27,7 +27,7 @@ const TitleScreen = () => {
       <View style={styles.container}>
         {/* Dodaj tło zdjęcia */}
         <Image
-          source={require("../img/title.jpg")}
+          source={require("../img/title2.jpg")}
           style={styles.backgroundImage}
         />
         {/* Wyświetl napis na tle zdjęcia */}
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     flex: 1, // Użyj flex, aby zajmować cały dostępny obszar ekranu
   },
   backgroundImage: {
+    marginTop: 50,
     flex: 1, // Użyj flex, aby zdjęcie zajęło cały dostępny obszar
     resizeMode: "cover", // Dostosuj zdjęcie do wymiarów ekranu
     width: "100%", // Szerokość zdjęcia na cały ekran
@@ -58,15 +59,26 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
-    color: "white", // Kolor napisu na tle zdjęcia
+    color: "black", // Zmieniamy kolor tekstu na czarny
     textAlign: "center",
     margin: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.65)", // Ustawiamy półprzezroczyste tło
+    backdropFilter: "blur(10px)", // Rozmywamy tło o 10 pikseli (możesz dostosować wartość)
+    width: "100%",
+    textTransform: "uppercase",
+    fontWeight: "bold",
   },
+
   textTop: {
     fontSize: 24,
-    color: "white", // Kolor napisu na tle zdjęcia
+    color: "black", // Kolor napisu na tle zdjęcia
     textAlign: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.65)", // Ustawiamy półprzezroczyste tło
+    backdropFilter: "blur(10px)", // Rozmywamy tło o 10 pikseli (możesz dostosować wartość)
+    width: "100%",
+    textTransform: "uppercase",
     marginTop: 100,
+    fontWeight: "bold",
   },
 });
 

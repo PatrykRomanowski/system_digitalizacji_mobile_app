@@ -14,6 +14,7 @@ import SettingScreen from "./src/settingScreen";
 import ReceiptScreen from "./src/receiptScreen";
 import DocumentScreen from "./src/documentsScreen";
 import ShowDocumentGallery from "./src/showDocumentGallery";
+import ShowBookGallery from "./src/showBookGallery";
 
 import store from "./storage";
 
@@ -64,6 +65,7 @@ function MainStack() {
         options={{
           headerShown: false,
           tabBarLabel: "Settings",
+          title: "STRONA GŁÓWNA2",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" color={color} size={size} />
           ),
@@ -86,12 +88,23 @@ export default function App() {
           <Stack.Screen
             name="Home"
             component={MainStack}
-            // options={{ headerShown: false }}
+            options={{
+              title: "WRÓĆ DO LOGOWANIA",
+            }}
           />
           <Stack.Screen
             name="GalleryDocument"
             component={ShowDocumentGallery}
-            // options={{ headerShown: false }}
+            options={{
+              title: "WRÓĆ DO STRONY GŁÓWNEJ",
+            }}
+          />
+          <Stack.Screen
+            name="BookGallery"
+            component={ShowBookGallery}
+            options={{
+              title: "WRÓĆ DO STRONY GŁÓWNEJ",
+            }}
           />
           <Stack.Screen
             name="LoginScreen"

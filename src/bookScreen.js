@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import {
   View,
   Text,
@@ -9,9 +10,12 @@ import {
   RefreshControl,
   TextInput,
   ScrollView,
+  Modal,
 } from "react-native";
 import { ref, get } from "firebase/database";
 import { useSelector } from "react-redux";
+
+import { useNavigation } from "@react-navigation/native";
 
 import { firebaseRealtime } from "./firebase";
 import { listAll, ref as refStorage, getDownloadURL } from "firebase/storage";
@@ -21,6 +25,9 @@ import { myStorage } from "./firebase";
 const BookScreen = () => {
   const userId = useSelector((state) => state.userStatus.userId);
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
   const [allBooks, setAllBooks] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [authorValue, setAuthorValue] = useState("");
@@ -28,11 +35,56 @@ const BookScreen = () => {
   const [refreshing, setRefreshing] = useState(true);
   const [indicatorIsActive, setIndicatorIsActive] = useState(true);
   const [sortAllItem, setSortAllItem] = useState([]);
+  const [actualBook, setActualBook] = useState();
+  const [bookLength, setBookLength] = useState(0);
+  const [inputError, setInputError] = useState(null);
+
+  const navigation = useNavigation();
+
+  const openModal = (book) => {
+    console.log(book.book.bookLegth);
+    setBookLength(book.book.bookLegth);
+    setActualBook(book);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
 
   const onRefresh = () => {
-    console.log("XD");
     setRefreshing(false);
   };
+
+  const goToBookGallery = () => {
+    let bookLengthSet = 0;
+
+    if (inputValue === "") {
+      bookLengthSet = 0;
+      setInputError(null);
+    } else if (inputValue > bookLength || inputValue < 1) {
+      return;
+    } else {
+      bookLengthSet = inputValue;
+    }
+
+    setIsModalVisible(false);
+    navigation.navigate("BookGallery", {
+      xd: actualBook,
+      bookLengthProp: bookLengthSet,
+      allSiteInBook: bookLength,
+    });
+  };
+
+  useEffect(() => {
+    if (inputValue > bookLength) {
+      setInputError(
+        <Text style={styles.errorText}>książka nie ma tylu stron</Text>
+      );
+    } else if (inputValue <= bookLength || inputValue > 0) {
+      setInputError(null);
+    }
+  }, [inputValue]);
 
   useEffect(() => {
     setIndicatorIsActive(true);
@@ -66,6 +118,7 @@ const BookScreen = () => {
                 bookDescription: book.description,
                 bookSize: book.size.reduce((acc, current) => acc + current),
                 bookImage: url,
+                bookLegth: res.items.length,
               });
             } catch (error) {
               console.log("Błąd podczas pobierania URL obrazka:", error);
@@ -76,7 +129,6 @@ const BookScreen = () => {
         }
 
         setAllBooks(books);
-        console.log(data);
       } catch (err) {
         console.log(err);
       }
@@ -89,11 +141,18 @@ const BookScreen = () => {
     setIndicatorIsActive(true);
 
     const showAllBooks = allBooks.map((book) => {
-      // console.log(book);
       return (
-        <TouchableOpacity style={styles.itemContainer}>
-          <Text>{book.bookAuthor}</Text>
-          <Image style={styles.image} source={{ uri: book.bookImage }} />
+        <TouchableOpacity
+          onPress={() => openModal({ book })}
+          style={[styles.itemContainer, styles.card, styles.elevation]}
+        >
+          <Text style={styles.textAuthorAndTitle}>{book.bookAuthor}</Text>
+          <Image
+            resizeMode="contain"
+            style={styles.image}
+            source={{ uri: book.bookImage }}
+          />
+          <Text style={styles.textAuthorAndTitle}>{book.bookTitle}</Text>
         </TouchableOpacity>
       );
     });
@@ -102,21 +161,62 @@ const BookScreen = () => {
   }, [allBooks]);
 
   useEffect(() => {
-    console.log("XD2");
-  }, [sortAllItem]);
-
-  useEffect(() => {
     if (authorValue || titleValue) {
       if (authorValue && titleValue) {
-        const sortItems = allItems.filter((item) => {
-          return item.bookTitle
-            .toLowerCase()
-            .includes(titleValue.toLowerCase());
+        const sortItems = allBooks.filter((item) => {
+          const newItem = item.bookTitle && item.bookTitle.toLowerCase();
+          return newItem && newItem.includes(titleValue.toLowerCase());
         });
-        setSortAllItem(sortItems);
+        const additionalSort = sortItems.filter((item) => {
+          const newItem = item.bookAuthor && item.bookAuthor.toLowerCase();
+          return newItem && newItem.includes(authorValue.toLowerCase());
+        });
+        console.log("XD" + sortItems);
+        setSortAllItem(additionalSort);
       }
     }
+    if (authorValue && titleValue === "") {
+      console.log("DDD");
+      const sortItems = allBooks.filter((item) => {
+        const newItem = item.bookAuthor && item.bookAuthor.toLowerCase();
+        return newItem && newItem.includes(authorValue.toLowerCase());
+      });
+      setSortAllItem(sortItems);
+    }
+    if (authorValue === "" && titleValue) {
+      console.log("DDD");
+      const sortItems = allBooks.filter((item) => {
+        const newItem = item.bookTitle && item.bookTitle.toLowerCase();
+        return newItem && newItem.includes(titleValue.toLowerCase());
+      });
+      setSortAllItem(sortItems);
+    }
+
+    if (authorValue === "" && titleValue === "") {
+      setSortAllItem(allBooks);
+    }
   }, [authorValue, titleValue]);
+
+  useEffect(() => {
+    setIndicatorIsActive(true);
+    const showAllSortBooks = sortAllItem.map((book) => {
+      return (
+        <TouchableOpacity
+          onPress={() => openModal({ book })}
+          style={styles.itemContainer}
+        >
+          <Text>{book.bookAuthor}</Text>
+          <Image
+            resizeMode="contain"
+            style={styles.image}
+            source={{ uri: book.bookImage }}
+          />
+        </TouchableOpacity>
+      );
+    });
+    setAllItems(showAllSortBooks);
+    setIndicatorIsActive(false);
+  }, [sortAllItem]);
 
   return (
     <ScrollView
@@ -129,6 +229,9 @@ const BookScreen = () => {
         }
       }}
     >
+      {indicatorIsActive ? (
+        <ActivityIndicator size="large" style={styles.indicator} />
+      ) : null}
       <RefreshControl
         refreshing={refreshing} // Stan, który kontroluje, czy odświeżanie jest aktywowane
         onRefresh={onRefresh} // Funkcja, która ma być wywołana podczas odświeżania
@@ -149,14 +252,48 @@ const BookScreen = () => {
       </View>
 
       <Text style={styles.text}>Twoje książki</Text>
-      {indicatorIsActive ? (
-        <ActivityIndicator size="large" style={styles.indicator} />
-      ) : null}
 
-      <View style={styles.allItem}>
-        {allItems}
-        {allItems}
-      </View>
+      <View style={styles.allItem}>{allItems}</View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.modalButtonExit}
+              onPress={closeModal}
+            >
+              <Text style={{ color: "white" }}>X</Text>
+            </TouchableOpacity>
+            <Text style={styles.textModal}>Wpisz numer strony</Text>
+
+            <TextInput
+              placeholder=""
+              keyboardType="numeric"
+              value={inputValue}
+              onChangeText={(text) => setInputValue(text)}
+              style={styles.inputModal}
+            />
+            {inputError}
+            <TouchableOpacity
+              style={styles.modalButtonNext}
+              onPress={() => goToBookGallery()}
+            >
+              <Text style={styles.buttonText}>Przejdź do strony</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalButtonNext}
+              onPress={() => goToBookGallery()}
+            >
+              <Text style={styles.buttonText}>Zacznij od początku</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -167,12 +304,66 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     // alignItems: "center",
   },
-  itemContainer: {
-    margin: 10,
+  buttonText: {
+    color: "white",
+    textTransform: "uppercase",
   },
+  itemContainer: {
+    margin: 5,
+    width: "40%",
+    borderWidth: 1, // Grubość obramowania
+    borderColor: "gray", // Kolor obramowania
+    borderRadius: 5, // Zaokrąglenie narożników
+    // elevation: 5, // Dla Android
+  },
+  card: {
+    backgroundColor: "white",
+    borderRadius: 8,
+    marginVertical: 15,
+  },
+  elevation: {
+    elevation: 11,
+    shadowColor: "#111111",
+  },
+
   text: {
     fontSize: 24,
     fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  textAuthorAndTitle: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    marginBottom: 10,
+    fontSize: 10,
+    marginTop: 5,
+    textTransform: "uppercase",
+    overflow: "hidden", // Obcinaj tekst, który wystaje poza obszar
+    whiteSpace: "nowrap", // Zapobiegaj zawijaniu tekstu
+    textOverflow: "ellipsis", // Dodaj "..." na końcu przyciętego tekstu
+    fontWeight: "bold",
+  },
+
+  modalButtonNext: {
+    margin: 12,
+    backgroundColor: "#007AFF", // Dostosuj kolor tła
+    color: "white",
+    width: "80%",
+    height: 40,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  textModal: {
+    fontSize: 14,
+    fontWeight: "bold",
+    textTransform: "uppercase",
     marginTop: 20,
     marginBottom: 20,
     textAlign: "center",
@@ -183,7 +374,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: 150, // dostosuj szerokość i wysokość obrazu do swoich potrzeb
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%", // dostosuj szerokość i wysokość obrazu do swoich potrzeb
     height: 225,
   },
   allItem: {
@@ -192,6 +386,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     flexWrap: "wrap",
+  },
+  modalButtonExit: {
+    width: 30,
+    height: 30,
+    backgroundColor: "#007AFF", // Dostosuj kolor tła
+    borderRadius: 4, // Zaokrąglony kształt przycisku
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 10,
+    right: 10,
+    color: "black",
   },
   input: {
     width: 300,
@@ -202,6 +408,27 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 20,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Przezroczyste tło
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    width: "90%",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  inputModal: {
+    width: "100%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    paddingLeft: 10,
+    marginBottom: 30,
+  },
   indicator: {
     position: "absolute",
     top: 0, // Umieść indicator na górze
@@ -211,6 +438,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.6)", // Przezroczyste tło
     justifyContent: "center",
     alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
   },
 });
 

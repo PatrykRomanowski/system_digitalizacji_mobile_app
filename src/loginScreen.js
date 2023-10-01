@@ -27,7 +27,7 @@ const LoginScreen = () => {
       await signInWithEmailAndPassword(auth2, login, password).then(
         (userInfo) => {
           const userId = userInfo.user.uid;
-          console.log(userId);
+          console.log(userInfo);
           dispatch(userActions.addActualUserId({ value: userId }));
           setIsModalVisible(true); // Pokaż modal
           setModalMessage("Logowanie udane!"); // Ustaw treść modala

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, StyleSheet, Button, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -6,7 +6,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
 
   const goToDetailsScreen = () => {
-    navigation.navigate("Home2"); // Przechodzi do ekranu 'Home2'
+    navigation.navigate("Home"); // Przechodzi do ekranu 'Home2'
   };
 
   return (
